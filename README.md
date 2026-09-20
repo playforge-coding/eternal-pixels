@@ -2,8 +2,10 @@
 
 A UI suite and pixel art editor.
 
-Not built yet. What exists so far is the Bazel monorepo and `ink-rs`, Rust
-bindings to [Google Ink](https://github.com/google/ink).
+Not built yet. What exists so far is the Bazel monorepo, `ink-rs`, Rust
+bindings to [Google Ink](https://github.com/google/ink), and `eternal-styler`,
+a small CSS engine built on Servo's `cssparser` and `selectors` crates that
+the UI toolkit will use.
 
 ## Layout
 
@@ -11,11 +13,12 @@ bindings to [Google Ink](https://github.com/google/ink).
 crates/
   eternal-pixels/   the application            (AGPL-3.0)
   eternal-ui/       UI toolkit                 (MPL-2.0)
-  eternal-styler/   styling                    (MPL-2.0)
+  eternal-styler/   CSS engine for the toolkit (MPL-2.0)
   ink-rs/           Google Ink bindings        (MPL-2.0)
     cc/             the C++ facade
     src/            the safe Rust API
 patches/            Bazel module patches
+third_party/        crate_universe lockfile for crates.io dependencies
 tools/bindgen/      regenerates the FFI declarations
 tools/ink/          builds an Ink prefix for the Cargo build
 licenses/           licence texts, symlinked into each crate
@@ -43,9 +46,22 @@ bazel test  --config=rustfmt //...   # instead of cargo fmt --check
 bazel run @rules_rust//tools/rust_analyzer:gen_rust_project  # IDE support
 ```
 
+## Crates from crates.io
+
+Dependencies are declared in each crate's `Cargo.toml`. Bazel reads those
+manifests through rules_rust's crate_universe (see `MODULE.bazel`) and makes
+every dependency available as `@crates//:<name>`. The resolved graph is pinned
+in `crates/eternal-styler/Cargo.lock` and `third_party/cargo-bazel-lock.json`;
+after changing a `Cargo.toml`, regenerate both:
+
+```bash
+CARGO_BAZEL_REPIN=1 bazel build //...
+```
+
 ## The Cargo path
 
-`ink-rs` also has a `Cargo.toml` so it can be published to crates.io. Cargo
+`ink-rs` and `eternal-styler` also have a `Cargo.toml` so they can be published
+to crates.io. `eternal-styler` is pure Rust and builds with plain `cargo`. Cargo
 cannot build Ink, which is a Bazel project with no install step, so it links
 against a prefix you point it at. `tools/ink/bundle.sh` builds one from the
 Bazel outputs:
@@ -81,3 +97,5 @@ Pages live in `docs/src/`; add new ones to `docs/src/SUMMARY.md`.
 
 - [docs/src/ink-bindings.md](docs/src/ink-bindings.md): how the Ink bindings
   are put together, how to add to them, and why they no longer use Crubit.
+- [docs/src/styler.md](docs/src/styler.md): how the CSS engine is layered on
+  Servo's crates, how the cascade works, and how to add a property.

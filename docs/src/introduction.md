@@ -2,8 +2,10 @@
 
 A UI suite and pixel art editor.
 
-Not built yet. What exists so far is the Bazel monorepo and `ink-rs`, Rust
-bindings to [Google Ink](https://github.com/google/ink).
+Not built yet. What exists so far is the Bazel monorepo, `ink-rs`, Rust
+bindings to [Google Ink](https://github.com/google/ink), and `eternal-styler`,
+a small CSS engine built on Servo's `cssparser` and `selectors` crates that
+the UI toolkit will use.
 
 ## Layout
 
@@ -11,11 +13,12 @@ bindings to [Google Ink](https://github.com/google/ink).
 crates/
   eternal-pixels/   the application            (AGPL-3.0)
   eternal-ui/       UI toolkit                 (MPL-2.0)
-  eternal-styler/   styling                    (MPL-2.0)
+  eternal-styler/   CSS engine for the toolkit (MPL-2.0)
   ink-rs/           Google Ink bindings        (MPL-2.0)
     cc/             the C++ facade
     src/            the safe Rust API
 patches/            Bazel module patches
+third_party/        crate_universe lockfile for crates.io dependencies
 tools/bindgen/      regenerates the FFI declarations
 tools/ink/          builds an Ink prefix for the Cargo build
 licenses/           licence texts, symlinked into each crate

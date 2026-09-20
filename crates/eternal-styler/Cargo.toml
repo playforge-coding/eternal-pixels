@@ -1,0 +1,26 @@
+[package]
+name = "eternal-styler"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+license = "MPL-2.0"
+description = "A small CSS engine for UI toolkits, built on Servo's cssparser and selectors"
+repository = "https://github.com/playforge-coding/eternal-pixels"
+readme = "README.md"
+keywords = ["css", "style", "selectors", "ui", "gui"]
+categories = ["gui", "parser-implementations"]
+
+# Bazel files are of no use to someone consuming this from crates.io.
+exclude = ["BUILD.bazel"]
+
+[dependencies]
+# Servo's CSS tokenizer and parser. `selectors` pins the 0.37 line, so this
+# has to match it or there would be two copies of the parser in the build.
+cssparser = "0.37"
+# Colour syntax on top of cssparser, from the same repository.
+cssparser-color = "0.5"
+# Servo's selector parser and matcher, the same code Stylo uses.
+selectors = "0.40"
+# Needed to implement `SelectorImpl` for our string type.
+precomputed-hash = "0.1"
+bitflags = "2"
