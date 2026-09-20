@@ -32,6 +32,14 @@ If a clippy error already existed, you don't need to fix it, but do note it.
 
 PLEASE, PLEASE do not use a package that is old or deprecated. When possible use the latest version.
 
+## Bump
+
+Bump the crate versions when needed.
+
+## Wrappers
+
+Prefer to use crates like [`zerocopy`](https://github.com/google/zerocopy) for memory management instead of `unsafe` when applicable.
+
 ## Keep things human
 
 Do not use em dashes or other special symbols not normally found in writing. Do not word things in a weird way. Keep it looking human.
