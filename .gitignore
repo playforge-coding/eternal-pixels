@@ -1,0 +1,13 @@
+# Bazel
+/bazel-*
+/user.bazelrc
+
+# Ink prefix built by tools/ink/bundle.sh for the Cargo build.
+/.ink-prefix
+
+# Cargo build output.
+/target
+/crates/*/target
+
+# mdBook output.
+/docs/book

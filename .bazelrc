@@ -1,0 +1,26 @@
+# Eternal Pixels - Bazel configuration.
+
+common --enable_bzlmod
+common --enable_platform_specific_config
+
+# Ink is C++20. The flag has to be set here rather than inherited from Ink's own
+# .bazelrc, because a dependency's .bazelrc is never read.
+build --cxxopt=-std=c++20 --host_cxxopt=-std=c++20
+
+# Ink pulls in Dawn for shader generation. We only ever read WGSL and write MSL,
+# so the other Tint writers/readers are dead weight. Same values Ink uses.
+common --@dawn//src/tint:tint_build_hlsl_writer=false
+common --@dawn//src/tint:tint_build_spv_reader=false
+
+# `bazel build --config=clippy //...` replaces `cargo clippy`.
+build:clippy --aspects=@rules_rust//rust:defs.bzl%rust_clippy_aspect
+build:clippy --output_groups=+clippy_checks
+
+# `bazel test --config=rustfmt //...` replaces `cargo fmt --check`.
+build:rustfmt --aspects=@rules_rust//rust:defs.bzl%rustfmt_aspect
+build:rustfmt --output_groups=+rustfmt_checks
+
+build --keep_going
+test --test_output=errors
+
+try-import %workspace%/user.bazelrc

@@ -1,0 +1,54 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+load(
+    "@rules_rust//rust:defs.bzl",
+    "rust_doc",
+    "rust_library",
+    "rust_test",
+)
+
+package(default_visibility = ["//visibility:public"])
+
+exports_files(["LICENSE"])
+
+rust_library(
+    name = "ink-rs",
+    srcs = glob(["src/**/*.rs"]),
+    crate_name = "ink_rs",
+    edition = "2024",
+    # The FFI declarations are checked in (src/ffi/generated.rs), so this only
+    # has to link the facade; there is no binding generation step. Cargo builds
+    # the same two pieces through build.rs.
+    #
+    # `link_deps` rather than `deps`: a C++ library in `deps` is deprecated in
+    # rules_rust and warns on every build.
+    link_deps = ["//crates/ink-rs/cc:ink_ffi"],
+)
+
+# No unit-test target for the library itself: src/ has no #[cfg(test)] tests,
+# and everything worth checking needs real Ink, which the integration test
+# below drives. Add one here if unit tests appear.
+
+rust_test(
+    name = "strokes_test",
+    srcs = ["tests/strokes.rs"],
+    edition = "2024",
+    deps = [":ink-rs"],
+)
+
+rust_doc(
+    name = "docs",
+    crate = ":ink-rs",
+)
+
+# No rust_doc_test target. rustdoc links its test binaries against the Rust
+# standard library as a dylib and rules_rust does not set an rpath for it on
+# macOS, so every doc test dies before running:
+#
+#     dyld: Library not loaded: @rpath/libstd-*.dylib ... no LC_RPATH's found
+#
+# That is a rules_rust/macOS problem rather than anything to do with these
+# bindings. The example in lib.rs is still worth keeping correct; check it by
+# hand until this is resolved.

@@ -1,0 +1,33 @@
+[package]
+name = "ink-rs"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.85"
+license = "MPL-2.0"
+description = "Rust bindings for Google Ink, the freehand stroke library behind Android Jetpack Ink"
+repository = "https://github.com/playforge-coding/eternal-pixels"
+readme = "README.md"
+keywords = ["ink", "stroke", "handwriting", "stylus", "graphics"]
+categories = ["api-bindings", "graphics"]
+build = "build.rs"
+
+# Declares that this crate links the native `ink_ffi` facade, so Cargo will
+# refuse a build that ends up with two copies of it.
+links = "ink_ffi"
+
+# Bazel files and the generator script are of no use to someone consuming this
+# from crates.io, and `cc/` has to be included because build.rs compiles it.
+exclude = ["BUILD.bazel", "cc/BUILD.bazel"]
+
+[build-dependencies]
+cc = "1"
+
+[package.metadata.docs.rs]
+# docs.rs has no Ink to link against. build.rs notices DOCS_RS and skips the
+# native build, which is enough to render the docs.
+all-features = true
+
+[package.metadata.ink]
+# The Ink commit these bindings are written against. Keep in sync with the
+# git_override in //MODULE.bazel.
+commit = "dd67b9bb6524d002d5a43e1fe9286066a810af1e"

@@ -1,0 +1,35 @@
+Drop Ink's toolchains_llvm usage so Ink can be used as a dependency.
+
+toolchains_llvm's `llvm` module extension fails outright for any module that
+is not the root:
+
+    Error in fail: Only the root module can use the 'llvm' extension
+
+Ink configures it to get a host C++ toolchain, which works when Ink is the
+root module but makes Ink undepend-able from anywhere else. Crubit pulls in
+toolchains_llvm too, so both ends of this build hit it.
+
+We register the host toolchain from //MODULE.bazel instead (apple_cc on macOS),
+so nothing here is lost.
+
+--- a/MODULE.bazel
++++ b/MODULE.bazel
+@@ -48,15 +48,10 @@
+ go_sdk = use_extension("@rules_go//go:extensions.bzl", "go_sdk")
+ go_sdk.download(version = "1.23.6")
+ 
+-# Configure and register the LLVM toolchain for host builds by default:
+-bazel_dep(name = "toolchains_llvm", version = "1.5.0")
++# The host C++ toolchain is registered by the root module. toolchains_llvm
++# refuses to run its `llvm` extension for anything but the root module, so a
++# module that configures it cannot be depended on.
+ 
+-llvm = use_extension("@toolchains_llvm//toolchain/extensions:llvm.bzl", "llvm")
+-llvm.toolchain(llvm_version = "19.1.0")
+-use_repo(llvm, "llvm_toolchain")
+-
+-register_toolchains("@llvm_toolchain//:all")
+-
+ # Configure the Android NDK toolchain for NDK builds. Don't register that here so it's not required
+ # for builds that don't need it. Those configs can register those in --extra_toolchains.
+ bazel_dep(name = "rules_android_ndk", version = "0.1.3")
