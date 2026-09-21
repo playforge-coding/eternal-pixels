@@ -47,10 +47,10 @@ git_override(
 #################################################################################
 
 # crate_universe reads the crates' Cargo.toml files and generates a Bazel
-# target for every dependency, reachable as @crates//:<name>. Cargo.lock pins
-# the versions; the JSON lockfile is crate_universe's own rendering of the
-# resolved graph. Only eternal-styler has dependencies so far; add other
-# manifests here as crates grow some.
+# target for every dependency, reachable as @crates//:<name>. The manifests
+# are spliced into one synthetic workspace, whose Cargo.lock lives in
+# //third_party (the crates' own Cargo.lock files are for the Cargo path);
+# the JSON lockfile is crate_universe's own rendering of the resolved graph.
 #
 # After changing a Cargo.toml or either lockfile:
 #
@@ -58,9 +58,13 @@ git_override(
 crate = use_extension("@rules_rust//crate_universe:extensions.bzl", "crate")
 crate.from_cargo(
     name = "crates",
-    cargo_lockfile = "//crates/eternal-styler:Cargo.lock",
+    cargo_lockfile = "//third_party:Cargo.lock",
     lockfile = "//third_party:cargo-bazel-lock.json",
-    manifests = ["//crates/eternal-styler:Cargo.toml"],
+    manifests = [
+        "//crates/eternal-styler:Cargo.toml",
+        "//crates/eternal-ui:Cargo.toml",
+        "//crates/eternal-ui-skia:Cargo.toml",
+    ],
 )
 use_repo(crate, "crates")
 

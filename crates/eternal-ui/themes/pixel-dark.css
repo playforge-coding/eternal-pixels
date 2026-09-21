@@ -1,0 +1,134 @@
+/* Eternal UI's default theme: dark, dense, flat, 1px borders, in the spirit
+ * of Aseprite. Everything a widget looks like is here; copy this file and
+ * change it, or add a stylesheet after it to override parts.
+ *
+ * Elements: column, row, panel, label, button, checkbox (with a `check`
+ * child), input, separator, spacer.
+ * Classes: panel, toolbar, primary, title, dim, vertical. */
+
+* {
+    font-family: monospace;
+    font-size: 11px;
+    color: #d8d8d8;
+}
+
+panel, .panel {
+    background-color: #2b2b2b;
+    border: 1px solid #1c1c1c;
+    padding: 4px;
+    gap: 4px;
+}
+
+.toolbar {
+    background-color: #333333;
+    border-bottom: 1px solid #1c1c1c;
+    padding: 2px;
+    gap: 2px;
+}
+
+label.title {
+    font-weight: bold;
+    color: #ffffff;
+}
+
+label.dim {
+    color: #9a9a9a;
+}
+
+button {
+    background-color: #3f3f3f;
+    border: 1px solid #1c1c1c;
+    padding: 2px 6px;
+    gap: 4px;
+    color: #ececec;
+}
+
+button:hover {
+    background-color: #4b4b4b;
+}
+
+button:active {
+    background-color: #262626;
+}
+
+button:focus-visible {
+    border-color: #5b9bd5;
+}
+
+button:disabled {
+    background-color: #363636;
+    color: #7a7a7a;
+}
+
+button.primary {
+    background-color: #3b6ea5;
+    border-color: #2a4f78;
+}
+
+button.primary:hover {
+    background-color: #4a80b8;
+}
+
+button.primary:active {
+    background-color: #2f5a88;
+}
+
+input {
+    background-color: #1e1e1e;
+    border: 1px solid #141414;
+    padding: 2px 4px;
+    min-width: 96px;
+    color: #ececec;
+}
+
+input:focus {
+    border-color: #5b9bd5;
+}
+
+input:placeholder-shown {
+    color: #7a7a7a;
+}
+
+input:disabled {
+    color: #7a7a7a;
+}
+
+checkbox {
+    gap: 4px;
+    padding: 1px 0;
+}
+
+check {
+    width: 10px;
+    height: 10px;
+    border: 1px solid #141414;
+    background-color: #1e1e1e;
+}
+
+checkbox:hover > check,
+checkbox:focus-visible > check {
+    border-color: #5b9bd5;
+}
+
+checkbox:checked > check {
+    background-color: #5b9bd5;
+}
+
+checkbox:disabled {
+    color: #7a7a7a;
+}
+
+checkbox:disabled > check {
+    background-color: #2b2b2b;
+}
+
+separator {
+    background-color: #1c1c1c;
+    height: 1px;
+}
+
+row > separator,
+separator.vertical {
+    width: 1px;
+    height: auto;
+}

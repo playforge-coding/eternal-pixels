@@ -2,10 +2,12 @@
 
 A UI suite and pixel art editor.
 
-Not built yet. What exists so far is the Bazel monorepo, `ink-rs`, Rust
-bindings to [Google Ink](https://github.com/google/ink), and `eternal-styler`,
-a small CSS engine built on Servo's `cssparser` and `selectors` crates that
-the UI toolkit will use.
+The editor is not built yet. What exists so far is the Bazel monorepo and
+the libraries it will be made of: `ink-rs`, Rust bindings to
+[Google Ink](https://github.com/google/ink); `eternal-styler`, a small CSS
+engine built on Servo's `cssparser` and `selectors` crates; `eternal-ui`, a
+dense, keyboard-first UI toolkit styled with that CSS; and `eternal-ui-skia`,
+its Skia rendering backend.
 
 ## Layout
 
@@ -13,6 +15,8 @@ the UI toolkit will use.
 crates/
   eternal-pixels/   the application            (AGPL-3.0)
   eternal-ui/       UI toolkit                 (MPL-2.0)
+    themes/         the built-in stylesheet
+  eternal-ui-skia/  Skia backend for the toolkit (MPL-2.0)
   eternal-styler/   CSS engine for the toolkit (MPL-2.0)
   ink-rs/           Google Ink bindings        (MPL-2.0)
     cc/             the C++ facade
@@ -51,17 +55,21 @@ bazel run @rules_rust//tools/rust_analyzer:gen_rust_project  # IDE support
 Dependencies are declared in each crate's `Cargo.toml`. Bazel reads those
 manifests through rules_rust's crate_universe (see `MODULE.bazel`) and makes
 every dependency available as `@crates//:<name>`. The resolved graph is pinned
-in `crates/eternal-styler/Cargo.lock` and `third_party/cargo-bazel-lock.json`;
-after changing a `Cargo.toml`, regenerate both:
+in `third_party/Cargo.lock` and `third_party/cargo-bazel-lock.json`; after
+changing a `Cargo.toml`, regenerate both:
 
 ```bash
 CARGO_BAZEL_REPIN=1 bazel build //...
 ```
 
+The first build of `eternal-ui-skia` downloads a prebuilt Skia through
+skia-safe's build script, which runs inside the sandbox.
+
 ## The Cargo path
 
-`ink-rs` and `eternal-styler` also have a `Cargo.toml` so they can be published
-to crates.io. `eternal-styler` is pure Rust and builds with plain `cargo`. Cargo
+Every crate also has a `Cargo.toml` so it can be published to crates.io.
+`eternal-styler`, `eternal-ui` and `eternal-ui-skia` are pure Rust (Skia comes
+prebuilt) and build with plain `cargo` in their own directories. Cargo
 cannot build Ink, which is a Bazel project with no install step, so it links
 against a prefix you point it at. `tools/ink/bundle.sh` builds one from the
 Bazel outputs:
@@ -99,3 +107,6 @@ Pages live in `docs/src/`; add new ones to `docs/src/SUMMARY.md`.
   are put together, how to add to them, and why they no longer use Crubit.
 - [docs/src/styler.md](docs/src/styler.md): how the CSS engine is layered on
   Servo's crates, how the cascade works, and how to add a property.
+- [docs/src/ui.md](docs/src/ui.md): how the toolkit is put together, what a
+  frame looks like, the `ui!` macro, layout, and how to add a widget or a
+  rendering backend.

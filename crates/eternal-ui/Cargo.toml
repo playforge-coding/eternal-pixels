@@ -1,0 +1,18 @@
+[package]
+name = "eternal-ui"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.88"
+license = "MPL-2.0"
+description = "A small, dense, keyboard-first UI toolkit styled with CSS and rendered through pluggable backends"
+repository = "https://github.com/playforge-coding/eternal-pixels"
+readme = "README.md"
+keywords = ["gui", "ui", "css", "widgets", "pixel"]
+categories = ["gui"]
+
+# Bazel files are of no use to someone consuming this from crates.io.
+exclude = ["BUILD.bazel"]
+
+[dependencies]
+eternal-styler = { version = "0.1.0", path = "../eternal-styler" }
+bitflags = "2"

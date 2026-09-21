@@ -1,0 +1,21 @@
+[package]
+name = "eternal-ui-skia"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.88"
+license = "MPL-2.0"
+description = "Skia rendering backend for eternal-ui"
+repository = "https://github.com/playforge-coding/eternal-pixels"
+readme = "README.md"
+keywords = ["gui", "ui", "skia", "rendering"]
+categories = ["gui", "rendering"]
+
+# Bazel files are of no use to someone consuming this from crates.io.
+exclude = ["BUILD.bazel"]
+
+[dependencies]
+eternal-ui = { version = "0.1.0", path = "../eternal-ui" }
+# CPU rasterisation only by default. Enable skia-safe's `gl`, `metal` or
+# `vulkan` features in the application to draw into a GPU surface; the
+# renderer only needs a `Canvas`.
+skia-safe = "0.153"

@@ -1,0 +1,56 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+
+load(
+    "@rules_rust//rust:defs.bzl",
+    "rust_doc",
+    "rust_library",
+    "rust_test",
+)
+
+package(default_visibility = ["//visibility:public"])
+
+# Cargo.toml feeds crate_universe in //MODULE.bazel.
+exports_files([
+    "LICENSE",
+    "Cargo.toml",
+])
+
+rust_library(
+    name = "eternal-ui",
+    srcs = glob(["src/**/*.rs"]),
+    # The default theme is embedded with include_str!.
+    compile_data = ["themes/pixel-dark.css"],
+    crate_name = "eternal_ui",
+    edition = "2024",
+    deps = [
+        "//crates/eternal-styler",
+        "@crates//:bitflags",
+    ],
+)
+
+rust_test(
+    name = "unit_tests",
+    crate = ":eternal-ui",
+    edition = "2024",
+)
+
+rust_test(
+    name = "toolkit_test",
+    srcs = ["tests/toolkit.rs"],
+    edition = "2024",
+    deps = [
+        ":eternal-ui",
+        "//crates/eternal-styler",
+    ],
+)
+
+rust_doc(
+    name = "docs",
+    crate = ":eternal-ui",
+)
+
+# No rust_doc_test target, for the same reason as in //crates/ink-rs: rustdoc
+# test binaries cannot find libstd on macOS under rules_rust. The examples are
+# checked the Cargo way instead (`cargo test --doc` in this directory).
