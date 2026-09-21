@@ -141,10 +141,14 @@ what the stylesheet matches.
 
 `SkiaFonts` looks typefaces up through the system font manager by the CSS
 family names in a style, with the generic families mapped to common system
-fonts. `SkiaRenderer` draws onto any `skia_safe::Canvas`. Shapes are drawn
-without anti-aliasing and text without subpixel positioning so that 1px
-borders and pixel fonts stay crisp; `SkiaFonts::set_smooth` turns
-anti-aliasing on.
+fonts. Fonts of your own, such as a pixel font shipped with the
+application, are loaded with `SkiaFonts::load_font_file` (or `load_font`
+from bytes, for `include_bytes!`), optionally under a family name of your
+choosing with the `_as` variants, and are then matched ahead of system
+fonts by `font-family`. `SkiaRenderer` draws onto any `skia_safe::Canvas`.
+Shapes are drawn without anti-aliasing and text without subpixel
+positioning so that 1px borders and pixel fonts stay crisp;
+`SkiaFonts::set_smooth` turns anti-aliasing on.
 
 skia-safe fetches a prebuilt Skia for the target the first time it builds,
 which crate_universe runs inside Bazel's sandbox; the sandbox allows
@@ -161,7 +165,8 @@ surface and read pixels back, so they run headless.
 - `bazel run //crates/eternal-ui-skia:render_png_example` renders a
   showcase of the theme, with widgets hovered, pressed, focused, checked
   and disabled, to `eternal-ui.png` in the current directory. The quickest
-  way to see what a theme change looks like.
+  way to see what a theme change looks like. A second argument names a
+  font file to set everything in.
 
 The same files are `cargo run --example <name>` in each crate.
 

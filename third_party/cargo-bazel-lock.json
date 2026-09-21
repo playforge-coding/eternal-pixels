@@ -1,5 +1,5 @@
 {
-  "checksum": "61222cd8b231b883ac50011f4e8391f5f8e959ba18c08a4a3f0ed606db63b7bb",
+  "checksum": "eb16fd4da92f21b9c03207bab5176ba24ce5bb52c1914af8d5bfe8075daa04d0",
   "crates": {
     "adler2 2.0.1": {
       "name": "adler2",
@@ -1261,9 +1261,9 @@
       ],
       "license_file": null
     },
-    "eternal-ui-skia 0.1.0": {
+    "eternal-ui-skia 0.1.1": {
       "name": "eternal-ui-skia",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "package_url": "https://github.com/playforge-coding/eternal-pixels",
       "repository": null,
       "targets": [
@@ -1295,7 +1295,7 @@
           "selects": {}
         },
         "edition": "2024",
-        "version": "0.1.0"
+        "version": "0.1.1"
       },
       "license": "MPL-2.0",
       "license_ids": [
@@ -5152,7 +5152,7 @@
   "workspace_members": {
     "eternal-styler 0.1.0": "crates/eternal-styler",
     "eternal-ui 0.1.0": "crates/eternal-ui",
-    "eternal-ui-skia 0.1.0": "crates/eternal-ui-skia"
+    "eternal-ui-skia 0.1.1": "crates/eternal-ui-skia"
   },
   "conditions": {
     "aarch64-apple-darwin": [

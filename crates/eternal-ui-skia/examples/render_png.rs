@@ -6,13 +6,16 @@
 //! various states, so the look can be checked without a window.
 //!
 //! Writes `eternal-ui.png` in the current directory, or to the path given
-//! as the first argument. Run with
-//! `bazel run //crates/eternal-ui-skia:render_png_example` or
-//! `cargo run --example render_png`.
+//! as the first argument. A second argument names a font file (TrueType,
+//! OpenType or WOFF) to load and use for all text, to see a pixel font in
+//! place. Run with
+//! `bazel run //crates/eternal-ui-skia:render_png_example -- out.png font.ttf`
+//! or `cargo run --example render_png -- out.png font.ttf`.
 
 use std::path::PathBuf;
 use std::process::ExitCode;
 
+use eternal_ui::styler::Stylesheet;
 use eternal_ui::{Event, Key, Modifiers, PointerButton, Size, Ui, ui};
 use eternal_ui_skia::{SkiaFonts, SkiaRenderer};
 use skia_safe::EncodedImageFormat;
@@ -57,7 +60,16 @@ fn main() -> ExitCode {
         </column>
     });
 
-    let fonts = SkiaFonts::new();
+    let mut fonts = SkiaFonts::new();
+    if let Some(font_path) = std::env::args().nth(2) {
+        // Registered under a name of our own, then named in a stylesheet
+        // added after the theme so it wins.
+        if let Err(error) = fonts.load_font_file_as("custom", &font_path) {
+            eprintln!("{error}");
+            return ExitCode::FAILURE;
+        }
+        ui.add_stylesheet(Stylesheet::parse("* { font-family: custom; }").expect("a valid rule"));
+    }
     let size = Size::new(360.0, 150.0);
     ui.layout(size, &fonts);
 

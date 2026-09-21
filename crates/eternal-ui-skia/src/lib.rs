@@ -27,29 +27,60 @@
 //! Shapes are drawn without anti-aliasing and text without subpixel
 //! positioning, so 1px borders and pixel fonts stay crisp. Call
 //! [`SkiaFonts::set_smooth`] for the ordinary anti-aliased look.
+//!
+//! Fonts come from the system by default. Load your own, such as a pixel
+//! font shipped with the application, with [`SkiaFonts::load_font_file`]
+//! or [`SkiaFonts::load_font`], and name them in the stylesheet's
+//! `font-family`.
 
 use std::cell::RefCell;
 use std::collections::HashMap;
+use std::fmt;
+use std::path::Path;
 
 use eternal_ui::styler::{Color, Corners, FontStyle, Sides};
 use eternal_ui::{FontSpec, Fonts, Point, Rect, Renderer, TextMetrics};
 use skia_safe::font::Edging;
 use skia_safe::font_style::{Slant, Weight, Width};
 use skia_safe::{
-    Canvas, ClipOp, Color4f, Font, FontHinting, FontMgr, Paint, PaintStyle, RRect, Typeface, Vector,
+    Canvas, ClipOp, Color4f, Data, Font, FontHinting, FontMgr, Paint, PaintStyle, RRect, Typeface,
+    Vector,
 };
 
 /// Finds fonts and measures text with Skia.
 ///
-/// Typefaces are looked up through the system font manager by the CSS
-/// family names in a style, first match wins. The generic families
-/// `monospace`, `sans-serif`, `serif`, `system-ui` and `ui-monospace` map
-/// to common system fonts; anything unknown falls back to the default
-/// typeface.
+/// Typefaces are looked up by the CSS family names in a style, first match
+/// wins: fonts loaded with [`load_font`](Self::load_font) and its
+/// relatives are checked first, then the system font manager. The generic
+/// families `monospace`, `sans-serif`, `serif`, `system-ui` and
+/// `ui-monospace` map to common system fonts; anything unknown falls back
+/// to the default typeface.
+///
+/// ```no_run
+/// use eternal_ui_skia::SkiaFonts;
+///
+/// let mut fonts = SkiaFonts::new();
+/// // Registered under the family name inside the file...
+/// let family = fonts.load_font_file("assets/PixelOperator.ttf")?;
+/// // ...or under a name of your choosing, so the stylesheet can say
+/// // `font-family: pixel` without caring which file provides it.
+/// fonts.load_font_file_as("pixel", "assets/PixelOperator.ttf")?;
+/// # Ok::<(), eternal_ui_skia::FontError>(())
+/// ```
 pub struct SkiaFonts {
     font_mgr: FontMgr,
+    custom: Vec<CustomFont>,
     typefaces: RefCell<HashMap<TypefaceKey, Typeface>>,
     smooth: bool,
+}
+
+/// A font loaded from data rather than found on the system.
+struct CustomFont {
+    /// The name the stylesheet uses, lower-cased for matching.
+    family: String,
+    weight: i32,
+    italic: bool,
+    typeface: Typeface,
 }
 
 #[derive(Clone, PartialEq, Eq, Hash)]
@@ -69,9 +100,86 @@ impl SkiaFonts {
     pub fn new() -> Self {
         Self {
             font_mgr: FontMgr::new(),
+            custom: Vec::new(),
             typefaces: RefCell::new(HashMap::new()),
             smooth: false,
         }
+    }
+
+    /// Loads a font from the bytes of a TrueType, OpenType or WOFF file and
+    /// registers it under the family name the file declares, which is
+    /// returned. Several weights and styles of one family can be loaded
+    /// one file at a time; the closest match to a style's weight and slant
+    /// is used.
+    pub fn load_font(&mut self, bytes: &[u8]) -> Result<String, FontError> {
+        let typeface = self.typeface_from_bytes(bytes)?;
+        let family = typeface.family_name();
+        self.register(family.clone(), typeface);
+        Ok(family)
+    }
+
+    /// Like [`load_font`](Self::load_font), but registers the font under
+    /// `family` instead of the name in the file, so a stylesheet can refer
+    /// to it as `font-family: pixel` whatever the file says.
+    pub fn load_font_as(&mut self, family: &str, bytes: &[u8]) -> Result<(), FontError> {
+        let typeface = self.typeface_from_bytes(bytes)?;
+        self.register(family.to_owned(), typeface);
+        Ok(())
+    }
+
+    /// [`load_font`](Self::load_font) for a file on disk.
+    pub fn load_font_file(&mut self, path: impl AsRef<Path>) -> Result<String, FontError> {
+        let bytes = read_font_file(path.as_ref())?;
+        self.load_font(&bytes)
+            .map_err(|error| error.at(path.as_ref()))
+    }
+
+    /// [`load_font_as`](Self::load_font_as) for a file on disk.
+    pub fn load_font_file_as(
+        &mut self,
+        family: &str,
+        path: impl AsRef<Path>,
+    ) -> Result<(), FontError> {
+        let bytes = read_font_file(path.as_ref())?;
+        self.load_font_as(family, &bytes)
+            .map_err(|error| error.at(path.as_ref()))
+    }
+
+    /// The family names of the fonts loaded so far, in load order, as they
+    /// were registered.
+    pub fn loaded_families(&self) -> impl Iterator<Item = &str> {
+        self.custom.iter().map(|font| font.family.as_str())
+    }
+
+    fn typeface_from_bytes(&self, bytes: &[u8]) -> Result<Typeface, FontError> {
+        self.font_mgr
+            .new_from_data(Data::new_copy(bytes), None)
+            .ok_or(FontError::Unreadable { path: None })
+    }
+
+    fn register(&mut self, family: String, typeface: Typeface) {
+        let style = typeface.font_style();
+        self.custom.push(CustomFont {
+            family: family.to_ascii_lowercase(),
+            weight: *style.weight(),
+            italic: style.slant() != Slant::Upright,
+            typeface,
+        });
+        // A family that fell back to a system font before may resolve to
+        // the new font now.
+        self.typefaces.borrow_mut().clear();
+    }
+
+    /// The loaded font closest in weight and slant to what was asked for,
+    /// among those registered under `family`.
+    fn custom_typeface(&self, family: &str, weight: i32, italic: bool) -> Option<Typeface> {
+        self.custom
+            .iter()
+            .filter(|font| font.family.eq_ignore_ascii_case(family))
+            .min_by_key(|font| {
+                (font.weight - weight).abs() + if font.italic == italic { 0 } else { 1000 }
+            })
+            .map(|font| font.typeface.clone())
     }
 
     /// Whether to anti-alias text and shapes. Off by default for a pixel
@@ -116,12 +224,70 @@ impl SkiaFonts {
         let typeface = key
             .families
             .iter()
-            .flat_map(|family| candidates(family))
-            .find_map(|name| self.font_mgr.match_family_style(name, style))
+            .find_map(|family| {
+                self.custom_typeface(family, key.weight, key.italic)
+                    .or_else(|| {
+                        candidates(family)
+                            .into_iter()
+                            .find_map(|name| self.font_mgr.match_family_style(name, style))
+                    })
+            })
             .or_else(|| self.font_mgr.legacy_make_typeface(None, style))
             .expect("Skia has a default typeface");
         self.typefaces.borrow_mut().insert(key, typeface.clone());
         typeface
+    }
+}
+
+fn read_font_file(path: &Path) -> Result<Vec<u8>, FontError> {
+    std::fs::read(path).map_err(|source| FontError::Io {
+        path: path.display().to_string(),
+        source,
+    })
+}
+
+/// A font could not be loaded.
+#[derive(Debug)]
+pub enum FontError {
+    /// The file could not be read.
+    Io {
+        path: String,
+        source: std::io::Error,
+    },
+    /// Skia did not recognise the data as a font.
+    Unreadable {
+        /// The file it came from, when it came from one.
+        path: Option<String>,
+    },
+}
+
+impl FontError {
+    fn at(self, path: &Path) -> Self {
+        match self {
+            Self::Unreadable { path: None } => Self::Unreadable {
+                path: Some(path.display().to_string()),
+            },
+            other => other,
+        }
+    }
+}
+
+impl fmt::Display for FontError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Io { path, source } => write!(f, "{path}: {source}"),
+            Self::Unreadable { path: Some(path) } => write!(f, "{path}: not a font Skia can read"),
+            Self::Unreadable { path: None } => f.write_str("not a font Skia can read"),
+        }
+    }
+}
+
+impl std::error::Error for FontError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match self {
+            Self::Io { source, .. } => Some(source),
+            Self::Unreadable { .. } => None,
+        }
     }
 }
 

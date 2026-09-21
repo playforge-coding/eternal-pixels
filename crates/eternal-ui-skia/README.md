@@ -27,6 +27,23 @@ Shapes are drawn without anti-aliasing and text without subpixel
 positioning, so 1px borders and pixel fonts stay crisp. `SkiaFonts::set_smooth`
 turns anti-aliasing on for the ordinary look.
 
+## Custom fonts
+
+Fonts come from the system by default. To ship your own, load it and name
+it in the stylesheet:
+
+```rust
+let mut fonts = SkiaFonts::new();
+fonts.load_font_file_as("pixel", "assets/PixelOperator.ttf")?;
+ui.add_stylesheet(Stylesheet::parse("* { font-family: pixel, monospace; }")?);
+```
+
+`load_font_file` and `load_font` (from bytes, for `include_bytes!`) register
+a font under the family name inside the file instead, and return it. Load
+several files to cover the weights and styles of one family; the closest
+match to a style's `font-weight` and `font-style` is used. Loaded fonts are
+checked before system fonts.
+
 skia-safe downloads a prebuilt Skia for the target on first build. See its
 documentation for building Skia from source or targeting other platforms.
 
@@ -34,7 +51,8 @@ documentation for building Skia from source or targeting other platforms.
 
 `examples/render_png.rs` renders a showcase of the default theme, with widgets
 hovered, pressed, focused, checked and disabled, to `eternal-ui.png`:
-`cargo run --example render_png [path]`.
+`cargo run --example render_png [path [font.ttf]]`. Give it a font file to
+see the theme set in that font.
 
 ## Licence
 

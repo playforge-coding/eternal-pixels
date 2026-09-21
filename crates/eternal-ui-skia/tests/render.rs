@@ -93,3 +93,80 @@ fn paints_backgrounds_borders_and_text() {
         "expected glyph pixels inside {text:?}, found {dark}"
     );
 }
+
+/// A font file to load in tests, from wherever this machine keeps one.
+fn some_font_file() -> Option<&'static str> {
+    [
+        "/System/Library/Fonts/Supplemental/Arial.ttf",
+        "/System/Library/Fonts/Monaco.ttf",
+        "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+        "/usr/share/fonts/dejavu/DejaVuSans.ttf",
+        "/usr/share/fonts/TTF/DejaVuSans.ttf",
+        "C:\\Windows\\Fonts\\arial.ttf",
+    ]
+    .into_iter()
+    .find(|path| std::path::Path::new(path).is_file())
+}
+
+fn spec(family: &str) -> FontSpec {
+    FontSpec {
+        family: eternal_ui::styler::FontFamily::new([family]),
+        size: 12.0,
+        weight: Default::default(),
+        style: Default::default(),
+        line_height: None,
+    }
+}
+
+#[test]
+fn loaded_fonts_are_used_by_family_name() {
+    let Some(path) = some_font_file() else {
+        eprintln!("no font file found on this machine, skipping");
+        return;
+    };
+    let mut fonts = SkiaFonts::new();
+
+    // Under the name in the file.
+    let family = fonts.load_font_file(path).unwrap();
+    assert!(!family.is_empty());
+    assert_eq!(
+        fonts.font(&spec(&family)).typeface().family_name(),
+        family,
+        "the loaded font should win for its own family name"
+    );
+    assert_eq!(
+        fonts
+            .font(&spec(&family.to_uppercase()))
+            .typeface()
+            .family_name(),
+        family,
+        "family names match regardless of case"
+    );
+
+    // Under a name of our own, from bytes this time.
+    let bytes = std::fs::read(path).unwrap();
+    fonts.load_font_as("pixel", &bytes).unwrap();
+    assert_eq!(fonts.font(&spec("pixel")).typeface().family_name(), family);
+    assert_eq!(
+        fonts.loaded_families().collect::<Vec<_>>(),
+        [family.to_ascii_lowercase().as_str(), "pixel"]
+    );
+
+    // A family nobody provides still falls back to something.
+    let fallback = fonts.font(&spec("no-such-family")).typeface();
+    assert!(!fallback.family_name().is_empty());
+    assert!(fonts.measure("Hello", &spec("pixel")).width > 0.0);
+}
+
+#[test]
+fn bad_font_data_is_an_error() {
+    let mut fonts = SkiaFonts::new();
+    let error = fonts.load_font(b"definitely not a font").unwrap_err();
+    assert_eq!(error.to_string(), "not a font Skia can read");
+    let error = fonts.load_font_file("/no/such/font.ttf").unwrap_err();
+    assert!(
+        error.to_string().starts_with("/no/such/font.ttf: "),
+        "{error}"
+    );
+    assert!(fonts.loaded_families().next().is_none());
+}
