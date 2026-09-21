@@ -41,6 +41,15 @@ bazel test //...
 
 The first build is long: it compiles Ink and Abseil.
 
+## API reference
+
+The rustdoc for every crate is published next to this book at
+[`api/`](api/index.html). To build it locally:
+
+```bash
+tools/docs/build-api.sh       # writes docs/book/api
+```
+
 ## This book
 
 The book is built with [mdBook](https://rust-lang.github.io/mdBook/). To work

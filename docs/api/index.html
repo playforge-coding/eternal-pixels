@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<!-- The landing page of the API reference. tools/docs/build-api.sh copies it
+     next to the rustdoc output, which has no index of its own because the
+     crates are not a Cargo workspace. -->
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Eternal Pixels API reference</title>
+    <style>
+        :root {
+            color-scheme: light dark;
+            --fg: #1f1f1f;
+            --bg: #ffffff;
+            --dim: #6b6b6b;
+            --line: #d8d8d8;
+            --link: #2a5db0;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --fg: #d8d8d8;
+                --bg: #1e1e1e;
+                --dim: #9a9a9a;
+                --line: #3a3a3a;
+                --link: #7fb0f0;
+            }
+        }
+        body {
+            margin: 0;
+            padding: 2rem 1rem;
+            font: 16px/1.5 system-ui, sans-serif;
+            color: var(--fg);
+            background: var(--bg);
+        }
+        main {
+            max-width: 40rem;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 1.5rem;
+            margin: 0 0 0.25rem;
+        }
+        p {
+            margin: 0 0 1.5rem;
+            color: var(--dim);
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            border-top: 1px solid var(--line);
+        }
+        li {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--line);
+        }
+        a {
+            color: var(--link);
+            font-weight: 600;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        li span {
+            display: block;
+            color: var(--dim);
+        }
+        nav {
+            margin-top: 1.5rem;
+            color: var(--dim);
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>Eternal Pixels API reference</h1>
+        <p>The rustdoc for each crate in the repository.</p>
+        <ul>
+            <li>
+                <a href="eternal_ui/index.html">eternal_ui</a>
+                <span>A small, dense, keyboard-first UI toolkit styled with CSS.</span>
+            </li>
+            <li>
+                <a href="eternal_ui_skia/index.html">eternal_ui_skia</a>
+                <span>Skia rendering backend for eternal-ui.</span>
+            </li>
+            <li>
+                <a href="eternal_styler/index.html">eternal_styler</a>
+                <span>A small CSS engine built on Servo's cssparser and selectors crates.</span>
+            </li>
+            <li>
+                <a href="ink_rs/index.html">ink_rs</a>
+                <span>Rust bindings for Google Ink, the freehand stroke library.</span>
+            </li>
+        </ul>
+        <nav><a href="../">Back to the book</a></nav>
+    </main>
+</body>
+</html>

@@ -105,16 +105,22 @@ bazel run //crates/eternal-ui-skia:render_png_example # renders the theme to ete
 ## Documentation
 
 The docs are an [mdBook](https://rust-lang.github.io/mdBook/) under `docs/`,
-published to GitHub Pages by `.github/workflows/docs.yml` on every push to
-`main` that touches `docs/`. For that to work, the repository's Pages source
+with the rustdoc API reference for every crate published next to it at
+`api/`. Both are built and published to GitHub Pages by
+`.github/workflows/docs.yml` on every push to `main` that touches `docs/`,
+`crates/` or `tools/docs/`. For that to work, the repository's Pages source
 must be set to "GitHub Actions" in Settings > Pages.
 
 ```bash
-mdbook serve docs --open    # live preview while editing
+mdbook serve docs --open    # live preview of the book while editing
 mdbook build docs           # output in docs/book/
+tools/docs/build-api.sh     # the API reference, into docs/book/api/
 ```
 
-Pages live in `docs/src/`; add new ones to `docs/src/SUMMARY.md`.
+Pages live in `docs/src/`; add new ones to `docs/src/SUMMARY.md`. The API
+reference is built with Cargo rather than Bazel's `rust_doc` targets so that
+all four crates land in one tree with working links between them, and so
+that Ink does not need to be built: `ink-rs` renders its docs without it.
 
 - [docs/src/ink-bindings.md](docs/src/ink-bindings.md): how the Ink bindings
   are put together, how to add to them, and why they no longer use Crubit.
