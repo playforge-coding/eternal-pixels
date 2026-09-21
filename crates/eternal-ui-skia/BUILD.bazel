@@ -4,6 +4,7 @@
 
 load(
     "@rules_rust//rust:defs.bzl",
+    "rust_binary",
     "rust_doc",
     "rust_library",
     "rust_test",
@@ -31,6 +32,20 @@ rust_library(
 rust_test(
     name = "render_test",
     srcs = ["tests/render.rs"],
+    edition = "2024",
+    deps = [
+        ":eternal-ui-skia",
+        "//crates/eternal-ui",
+        "@crates//:skia-safe",
+    ],
+)
+
+# `bazel run //crates/eternal-ui-skia:render_png_example` writes
+# eternal-ui.png where you ran it; the same file is
+# `cargo run --example render_png` on the Cargo path.
+rust_binary(
+    name = "render_png_example",
+    srcs = ["examples/render_png.rs"],
     edition = "2024",
     deps = [
         ":eternal-ui-skia",

@@ -58,7 +58,7 @@ impl<M: 'static> Element<M> {
     ///
     /// `id`, `class`, `style`, `grow`, `align`, `disabled`, `shortcut` and
     /// `state` are understood by the framework; anything else goes to the
-    /// widget. An attribute nobody understands, an inline style that does
+    /// widget (containers take `align_items` and `justify`, for example). An attribute nobody understands, an inline style that does
     /// not parse or a bad shortcut is a mistake in the template, and panics
     /// with a message saying which.
     ///

@@ -9,7 +9,8 @@
 //! `height`, `min-*`, `max-*`, `margin`, `padding`, `border`, `gap`); which
 //! way a container goes, whether a child grows, and how children are
 //! aligned are attributes on the elements, since they are about structure
-//! rather than looks.
+//! rather than looks: `grow` and `align` on a child, `align_items` and
+//! `justify` on a container.
 //!
 //! `width` and `height` are border-box sizes, as with
 //! `box-sizing: border-box`. Percentages are of the parent's content box.

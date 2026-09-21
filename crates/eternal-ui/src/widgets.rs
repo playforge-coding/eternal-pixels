@@ -39,8 +39,10 @@ macro_rules! impl_widget_any {
 pub struct Container {
     axis: Axis,
     /// How children are placed across the axis unless they say otherwise.
+    /// The `align_items` attribute.
     pub align: Align,
-    /// How children are spread along the axis when there is room left.
+    /// How children are spread along the axis when there is room left. The
+    /// `justify` attribute.
     pub justify: Justify,
 }
 
@@ -65,7 +67,7 @@ impl Container {
 impl<M: 'static> Widget<M> for Container {
     fn set_attribute(&mut self, name: &str, value: &str) -> bool {
         match name {
-            "align" => match Align::parse(value) {
+            "align_items" => match Align::parse(value) {
                 Some(align) => {
                     self.align = align;
                     true

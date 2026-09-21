@@ -53,6 +53,12 @@ prefix.
 These bindings are written against Ink at commit
 `dd67b9bb6524d002d5a43e1fe9286066a810af1e`.
 
+## Example
+
+`examples/stroke.rs` draws a stroke frame by frame and prints the geometry as
+ASCII art: `cargo run --example stroke` (with `INK_ROOT` set), or
+`bazel run //crates/ink-rs:stroke_example` in the repository.
+
 ## How it works
 
 Ink's public API is built on `absl::StatusOr`, `absl::Span` and templates, none

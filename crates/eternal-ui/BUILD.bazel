@@ -4,6 +4,7 @@
 
 load(
     "@rules_rust//rust:defs.bzl",
+    "rust_binary",
     "rust_doc",
     "rust_library",
     "rust_test",
@@ -45,6 +46,21 @@ rust_test(
         "//crates/eternal-styler",
     ],
 )
+
+# `bazel run //crates/eternal-ui:<name>_example`; the same files are
+# `cargo run --example <name>` on the Cargo path.
+[
+    rust_binary(
+        name = name + "_example",
+        srcs = ["examples/" + name + ".rs"],
+        edition = "2024",
+        deps = [":eternal-ui"],
+    )
+    for name in [
+        "headless",
+        "custom_widget",
+    ]
+]
 
 rust_doc(
     name = "docs",

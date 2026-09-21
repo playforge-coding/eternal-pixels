@@ -89,6 +89,19 @@ regenerate the declarations. That needs bindgen (`cargo install bindgen-cli`),
 but only for whoever changes the header: the output is checked in, so building
 the crate never needs bindgen or libclang.
 
+## Examples
+
+Each crate has an `examples/` directory, built by Bazel as `<name>_example`
+binaries and by Cargo as ordinary examples:
+
+```bash
+bazel run //crates/ink-rs:stroke_example              # draws a stroke, prints it as ASCII
+bazel run //crates/eternal-styler:inspect_example     # a style inspector; pass a .css file to try yours
+bazel run //crates/eternal-ui:headless_example        # a whole app loop without a window
+bazel run //crates/eternal-ui:custom_widget_example   # a widget of your own
+bazel run //crates/eternal-ui-skia:render_png_example # renders the theme to eternal-ui.png
+```
+
 ## Documentation
 
 The docs are an [mdBook](https://rust-lang.github.io/mdBook/) under `docs/`,

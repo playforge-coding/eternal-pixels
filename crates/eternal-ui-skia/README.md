@@ -30,6 +30,12 @@ turns anti-aliasing on for the ordinary look.
 skia-safe downloads a prebuilt Skia for the target on first build. See its
 documentation for building Skia from source or targeting other platforms.
 
+## Example
+
+`examples/render_png.rs` renders a showcase of the default theme, with widgets
+hovered, pressed, focused, checked and disabled, to `eternal-ui.png`:
+`cargo run --example render_png [path]`.
+
 ## Licence
 
 MPL-2.0. Skia is BSD-3-Clause.

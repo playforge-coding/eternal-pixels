@@ -11,3 +11,6 @@
 
 # mdBook output.
 /docs/book
+
+# Written by the eternal-ui-skia render_png example.
+/eternal-ui.png

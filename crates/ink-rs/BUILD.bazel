@@ -4,6 +4,7 @@
 
 load(
     "@rules_rust//rust:defs.bzl",
+    "rust_binary",
     "rust_doc",
     "rust_library",
     "rust_test",
@@ -34,6 +35,15 @@ rust_library(
 rust_test(
     name = "strokes_test",
     srcs = ["tests/strokes.rs"],
+    edition = "2024",
+    deps = [":ink-rs"],
+)
+
+# `bazel run //crates/ink-rs:stroke_example`; the same file is
+# `cargo run --example stroke` on the Cargo path.
+rust_binary(
+    name = "stroke_example",
+    srcs = ["examples/stroke.rs"],
     edition = "2024",
     deps = [":ink-rs"],
 )

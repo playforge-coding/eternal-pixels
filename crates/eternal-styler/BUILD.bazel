@@ -4,6 +4,7 @@
 
 load(
     "@rules_rust//rust:defs.bzl",
+    "rust_binary",
     "rust_doc",
     "rust_library",
     "rust_test",
@@ -41,6 +42,15 @@ rust_test(
 rust_test(
     name = "cascade_test",
     srcs = ["tests/cascade.rs"],
+    edition = "2024",
+    deps = [":eternal-styler"],
+)
+
+# `bazel run //crates/eternal-styler:inspect_example -- theme.css`; the same
+# file is `cargo run --example inspect` on the Cargo path.
+rust_binary(
+    name = "inspect_example",
+    srcs = ["examples/inspect.rs"],
     edition = "2024",
     deps = [":eternal-styler"],
 )

@@ -69,6 +69,12 @@ Percentages are left as percentages in the computed style, because only layout
 knows what they are a percentage of. `em` and `rem` are resolved to pixels.
 `currentcolor` is resolved to the element's colour.
 
+## Example
+
+`examples/inspect.rs` is a style inspector: it styles a small widget tree and
+prints, for every element, which rules matched and what it computed to. Pass
+it a `.css` file to try your own: `cargo run --example inspect -- theme.css`.
+
 ## Licence
 
 MPL-2.0, like the Servo crates it is built on.

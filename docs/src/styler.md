@@ -112,6 +112,13 @@ order, which is what a style inspector wants.
 The compiler will point out anything missed: the table is the single source of
 truth for names, and `LonghandId` is matched exhaustively.
 
+## Trying a stylesheet
+
+`bazel run //crates/eternal-styler:inspect_example -- theme.css` styles a
+small fixed widget tree with your stylesheet and prints, for every element,
+which rules matched and what each property computed to. Without an argument
+it uses a built-in example stylesheet.
+
 ## Dependencies and Bazel
 
 `cssparser`, `cssparser-color`, `selectors`, `precomputed-hash` and

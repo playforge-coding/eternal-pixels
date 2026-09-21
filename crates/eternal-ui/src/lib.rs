@@ -76,8 +76,8 @@
 //!
 //! Containers lay their children out along one axis. Sizes, spacing and
 //! borders come from the stylesheet; `grow` and `align` attributes on
-//! elements and `align` and `justify` on containers decide how spare room
-//! is used. See the [`layout`] module.
+//! elements and `align_items` and `justify` on containers decide how spare
+//! room is used. See the [`layout`] module.
 
 mod element;
 mod event;

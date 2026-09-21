@@ -117,10 +117,10 @@ Containers lay their children out along one axis, like a CSS flex row or
 column that never wraps. Sizes, margins, padding, borders and gaps come from
 the stylesheet. Structure comes from attributes: `grow="1"` on a child
 takes a share of the spare room along the axis (that is all a `spacer` is),
-`align` on a child or a container places children across the axis
-(`start`, `center`, `end`, `stretch`), and `justify` on a container spreads
-them along it when nothing grows (`start`, `center`, `end`,
-`space-between`).
+`align` on a child places it across its parent's axis and `align_items` on
+a container sets the default for all its children (`start`, `center`,
+`end`, `stretch`), and `justify` on a container spreads them along the axis
+when nothing grows (`start`, `center`, `end`, `space-between`).
 
 `width` and `height` are border-box sizes. Percentages are of the parent's
 content box. The root always fills the window. There is no wrapping,
@@ -150,6 +150,20 @@ skia-safe fetches a prebuilt Skia for the target the first time it builds,
 which crate_universe runs inside Bazel's sandbox; the sandbox allows
 network access on macOS, so this just works. The tests render to a raster
 surface and read pixels back, so they run headless.
+
+## Examples
+
+- `bazel run //crates/eternal-ui:headless_example` runs a whole
+  application loop without a window: markup, a script of events, the
+  messages they produce, and the draw calls of a frame.
+- `bazel run //crates/eternal-ui:custom_widget_example` adds a widget of
+  its own, a colour swatch, styled by its tag.
+- `bazel run //crates/eternal-ui-skia:render_png_example` renders a
+  showcase of the theme, with widgets hovered, pressed, focused, checked
+  and disabled, to `eternal-ui.png` in the current directory. The quickest
+  way to see what a theme change looks like.
+
+The same files are `cargo run --example <name>` in each crate.
 
 ## What is left out
 

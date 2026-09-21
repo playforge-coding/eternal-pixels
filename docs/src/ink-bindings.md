@@ -3,6 +3,9 @@
 `crates/ink-rs` is a Rust wrapper around
 [Google Ink](https://github.com/google/ink).
 
+`bazel run //crates/ink-rs:stroke_example` draws a stroke frame by frame the
+way an app would and prints the resulting geometry as ASCII art.
+
 ## Why there is a C++ facade in the middle
 
 Ink's public API is built on `absl::StatusOr`, `absl::Span` and templates, none

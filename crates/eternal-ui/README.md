@@ -56,8 +56,8 @@ ui.widget_mut::<Label>(status).unwrap().set_text("Saved");
   `:focus`, `:focus-visible`, `:disabled`, `:checked`,
   `:placeholder-shown` and `:state(name)` for states you define.
 - **Layout**: one-axis containers, like flex rows and columns. Sizes,
-  spacing and borders come from CSS; `grow`, `align` and `justify`
-  attributes decide how spare room is used.
+  spacing and borders come from CSS; `grow` and `align` on children and
+  `align_items` and `justify` on containers decide how spare room is used.
 - **Keyboard**: Tab and Shift+Tab move focus, Enter and Space activate,
   buttons take a `shortcut="Ctrl+S"` attribute, and `Ui::bind` adds
   window-wide shortcuts. `Shortcut` parses and prints the menu spelling.
@@ -71,6 +71,14 @@ ui.widget_mut::<Label>(status).unwrap().set_text("Saved");
 Windowing is not included. Feed `Event`s from winit or anything else, give
 `layout` the window size, and paint into whatever surface your backend
 draws on.
+
+## Examples
+
+- `examples/headless.rs`: a whole application loop without a window, from
+  markup through events and messages to the draw calls of a frame.
+- `examples/custom_widget.rs`: a widget of your own, styled by its tag.
+
+Run them with `cargo run --example <name>`.
 
 ## Licence
 
